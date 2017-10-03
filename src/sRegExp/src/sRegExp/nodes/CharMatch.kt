@@ -1,9 +1,10 @@
 package sRegExp.nodes
 
+import sRegExp.CompiledRegExp
 import sRegExp.ExpReader
-import java.util.regex.Pattern
 
-class CharMatch : MatchNode() {
+class CharMatch(re : CompiledRegExp) : MatchNode(re) {
+
     inner class MatchPattern {
         var type : Int = 0 //0 - single 1 - range 2 - any(.)
         var single : Char =  '\\' //complex type要了我的命
@@ -24,6 +25,18 @@ class CharMatch : MatchNode() {
             return if(except) !result else result
         }
 
+        override fun toString(): String {
+            var str : String = ""
+            when(type){
+                0 -> str = "<SingleMatch Single:{$single}"
+                1 -> str = "<RangeMatch From {$range_from} to {$range_to}"
+                2 -> str = "<AnyMatch"
+            }
+
+            str += " Except {$except}>"
+            return str
+        }
+
     }
     //MatchPatterns
     private var matchCollection = ArrayList<MatchPattern>()
@@ -33,7 +46,7 @@ class CharMatch : MatchNode() {
     private var greedy : Boolean = true //?
     private var nomax : Boolean = false //+
 
-    override fun match(str : String, pos : Int) : ArrayList<Int>{
+    override fun match(str : String) : ArrayList<Int>{
         val r = ArrayList<Int>()
         var len  = 1
         if(min == 0) r.add(0)
@@ -71,7 +84,8 @@ class CharMatch : MatchNode() {
                 break
         }
 
-        //println(r)
+        //println("CharMatch: $r($str)")
+        if(!greedy) r.reverse()
         return r
     }
 
@@ -254,12 +268,19 @@ class CharMatch : MatchNode() {
                 a.forEach { it.except = true }
                 patterns.addAll(a)
             }
+
+            '(',')','{','}','[',']' -> { //各种特殊字符
+                var mp = MatchPattern()
+                mp.type = 0
+                mp.single = c
+                patterns.add(mp)
+            }
         }
 
         return patterns
     }
 
     override fun toString(): String {
-        return "<CharMatch {Pattern:{${this.matchCollection.count()}}} Min:{${this.min}} Max:{${this.max}}} Nomax:{${this.nomax}} Greedy {${this.greedy}}>"
+        return "<CharMatch {Pattern:{${this.matchCollection}}} Min:{${this.min}} Max:{${this.max}}} Nomax:{${this.nomax}} Greedy {${this.greedy}}>"
     }
 }
