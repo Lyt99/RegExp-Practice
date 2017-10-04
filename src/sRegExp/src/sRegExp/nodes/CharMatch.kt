@@ -269,6 +269,14 @@ class CharMatch(re : CompiledRegExp) : MatchNode(re) {
                 patterns.addAll(a)
             }
 
+            'd' -> {//数字
+                var mp = MatchPattern()
+                mp.type = 1
+                mp.range_from = '0'.toInt()
+                mp.range_to = '9'.toInt()
+                patterns.add(mp)
+            }
+
             '(',')','{','}','[',']' -> { //各种特殊字符
                 var mp = MatchPattern()
                 mp.type = 0

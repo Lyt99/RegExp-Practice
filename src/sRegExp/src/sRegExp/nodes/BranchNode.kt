@@ -40,24 +40,18 @@ class BranchNode(re : CompiledRegExp) : MatchNode(re){
 
         while (stk.isNotEmpty()) {
             var i = stk.pop()
-            var r = i.second!!.match(str.substring(i.first))
-            if (i.third.first != null && i.third.first is CaptureNode) { //设置捕获组
-                //println("设置捕获: ${i.third.second}")
-                this.parentRe.setGroup((i.third.first as CaptureNode).groupId, i.third.second)
-            }
 
-            //println("模式: ${i.second}, index: ${i.first}")
-            //println("匹配内容: ${str.substring(i.first)}")
+            //println("m模式: ${i.second}, index: ${i.first}")
+            //println("m匹配内容: ${str.substring(i.first)}")
+
+            var r = i.second!!.match(str.substring(i.first))
+
             if (r.isEmpty()) {//未匹配到
-                //println("匹配失败")
+                //println("m匹配失败")
                 continue
             }
             if (i.second?.nextNode == null) {//匹配完毕
-                //println("匹配成功")
-                //特例：捕获器在结尾
-                if (i.second is CaptureNode) {
-                    this.parentRe.setGroup((i.second as CaptureNode).groupId, str.substring(i.first, i.first + r[r.count() - 1]))
-                }
+                //println("m匹配成功")
                 r.forEach { res.add(i.first + it) }
                 continue
             }
@@ -70,38 +64,6 @@ class BranchNode(re : CompiledRegExp) : MatchNode(re){
 
         return res
 
-        /*
-        var res = ArrayList<Int>()
-
-        var stk = Stack<Pair<Int, MatchNode>>()
-        for (i in this.branches.reversed()) {
-            stk.push(Pair(0, i))
-        }
-
-        while (stk.isNotEmpty()) {
-            var i = stk.pop()
-            var r = i.second.match(str.substring(i.first))
-
-            //println("m模式: ${i.second}")
-            //println("m匹配内容: ${str.substring(i.first)}")
-            if (r.isEmpty()) {//未匹配到
-                //println("m匹配失败")
-                continue
-            }
-            if (i.second.nextNode == null) {//匹配完毕
-                //println("m匹配成功")
-                r.forEach { res.add(i.first + it) }
-                continue
-            }
-
-            for (res in r) {
-                stk.push(Pair(i.first + res, i.second.nextNode as MatchNode))
-            }
-        }
-
-
-        return res
-    */
     }
 
     fun matchReg(str : String) : Int{
@@ -114,14 +76,16 @@ class BranchNode(re : CompiledRegExp) : MatchNode(re){
 
         while (stk.isNotEmpty()) {
             var i = stk.pop()
+
+            //println("模式: ${i.second}, index: ${i.first}")
+            //println("匹配内容: ${str.substring(i.first)}")
+
             var r = i.second!!.match(str.substring(i.first))
             if(i.third.first != null && i.third.first is CaptureNode) { //设置捕获组
                 //println("设置捕获: ${i.third.second}")
                 this.parentRe.setGroup((i.third.first as CaptureNode).groupId, i.third.second)
             }
 
-            //println("模式: ${i.second}, index: ${i.first}")
-            //println("匹配内容: ${str.substring(i.first)}")
             if (r.isEmpty()) {//未匹配到
                 //println("匹配失败")
                 continue

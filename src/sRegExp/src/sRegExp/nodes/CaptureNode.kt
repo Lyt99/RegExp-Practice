@@ -21,7 +21,6 @@ class CaptureNode(re : CompiledRegExp) : MatchNode(re) {
 
     override fun match(str: String): ArrayList<Int> {
         val a =this.begin.match(str)
-        a.reverse()
         return a
     }
 

@@ -8,7 +8,7 @@ class FindResult {
 
     override fun toString(): String {
         if(success){
-            return "<SuccessfulFind GroupCount:${this.group.count()}>"
+            return "<SuccessfulFind \"${this.group[0]}\" GroupCount:${this.group.count()}>"
         }
         else{
             return "<FailedFind>"

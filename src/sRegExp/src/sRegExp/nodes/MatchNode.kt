@@ -12,6 +12,7 @@ abstract  class MatchNode constructor(re : CompiledRegExp){
 
     companion object {
         internal fun compileOne(reader: ExpReader, parentRe: CompiledRegExp): MatchNode {
+
             when (reader.peek()) {
                 '$' -> {
                     return EndMatch(parentRe).init(reader)
