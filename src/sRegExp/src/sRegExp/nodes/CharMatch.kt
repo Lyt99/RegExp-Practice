@@ -9,15 +9,15 @@ class CharMatch(re : CompiledRegExp) : MatchNode(re) {
         var type : Int = 0 //0 - single 1 - range 2 - any(.)
         var single : Char =  '\\' //complex type要了我的命
         //range
-        var range_from : Int = 0
-        var range_to : Int = 0
+        var rangeFrom : Int = 0
+        var rangeTo : Int = 0
         var except : Boolean = false
 
         fun match(c : Char): Boolean{
-            var result : Boolean
+            val result : Boolean
             when(type){
                 0 -> result = c == single
-                1 -> result = (c.toInt() in range_from..range_to)
+                1 -> result = (c.toInt() in rangeFrom..rangeTo)
                 2 -> result = true
                 else -> throw Exception("Unknown match type.")
             }
@@ -26,10 +26,10 @@ class CharMatch(re : CompiledRegExp) : MatchNode(re) {
         }
 
         override fun toString(): String {
-            var str : String = ""
+            var str = ""
             when(type){
                 0 -> str = "<SingleMatch Single:{$single}"
-                1 -> str = "<RangeMatch From {$range_from} to {$range_to}"
+                1 -> str = "<RangeMatch From {$rangeFrom} to {$rangeTo}"
                 2 -> str = "<AnyMatch"
             }
 
@@ -103,16 +103,15 @@ class CharMatch(re : CompiledRegExp) : MatchNode(re) {
 
             }
             '[' -> {
-                var t = sr.readUntil(']')
-                if(t == null) throw Exception("Syntax error.")//elvis???
-                var reader = ExpReader(t)
+                val t = sr.readUntil(']') ?: throw Exception("Syntax error.")
+                val reader = ExpReader(t)
                 var except = false
 
                 if(reader.peek() == '^') except = true
 
                 while(reader.peek() != ']'){
-                    var ch = reader.read()
-                    var mp = MatchPattern()
+                    val ch = reader.read()
+                    val mp = MatchPattern()
                     when(ch){
 
                         '-' -> throw Exception("Syntax Error.")
@@ -125,8 +124,8 @@ class CharMatch(re : CompiledRegExp) : MatchNode(re) {
                             if(reader.peek() == '-'){
                                 reader.read()
                                 mp.type = 1 // range
-                                mp.range_from = ch.toInt()
-                                mp.range_to = reader.read().toInt()
+                                mp.rangeFrom = ch.toInt()
+                                mp.rangeTo = reader.read().toInt()
                                 mp.except = except
                                 mpl.add(mp)
                             }
@@ -213,20 +212,20 @@ class CharMatch(re : CompiledRegExp) : MatchNode(re) {
 
                 var mp = MatchPattern()
                 mp.type = 1
-                mp.range_from = 'A'.toInt()
-                mp.range_to = 'Z'.toInt()
+                mp.rangeFrom = 'A'.toInt()
+                mp.rangeTo = 'Z'.toInt()
                 patterns.add(mp)
 
                 mp = MatchPattern()
                 mp.type = 1
-                mp.range_from = 'a'.toInt()
-                mp.range_to = 'z'.toInt()
+                mp.rangeFrom = 'a'.toInt()
+                mp.rangeTo = 'z'.toInt()
                 patterns.add(mp)
 
                 mp = MatchPattern()
                 mp.type = 1
-                mp.range_from = '0'.toInt()
-                mp.range_to = '9'.toInt()
+                mp.rangeFrom = '0'.toInt()
+                mp.rangeTo = '9'.toInt()
                 patterns.add(mp)
 
                 mp = MatchPattern()
@@ -258,27 +257,27 @@ class CharMatch(re : CompiledRegExp) : MatchNode(re) {
             }
 
             'S' -> {//除/s外
-                var a = getEscapedPatterns('s')
+                val a = getEscapedPatterns('s')
                 a.forEach { it.except = true }
                 patterns.addAll(a)
             }
 
             'W' -> {//除/w外
-                var a = getEscapedPatterns('w')
+                val a = getEscapedPatterns('w')
                 a.forEach { it.except = true }
                 patterns.addAll(a)
             }
 
             'd' -> {//数字
-                var mp = MatchPattern()
+                val mp = MatchPattern()
                 mp.type = 1
-                mp.range_from = '0'.toInt()
-                mp.range_to = '9'.toInt()
+                mp.rangeFrom = '0'.toInt()
+                mp.rangeTo = '9'.toInt()
                 patterns.add(mp)
             }
 
             '(',')','{','}','[',']' -> { //各种特殊字符
-                var mp = MatchPattern()
+                val mp = MatchPattern()
                 mp.type = 0
                 mp.single = c
                 patterns.add(mp)

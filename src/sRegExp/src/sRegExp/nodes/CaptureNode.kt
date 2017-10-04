@@ -11,17 +11,15 @@ class CaptureNode(re : CompiledRegExp) : MatchNode(re) {
     override fun init(sr: ExpReader): MatchNode {
         this.groupId = this.parentRe.getNewGroupId()
 
-        var exp = sr.readPair()
-        if(exp == null) throw Exception("Syntax error.")
-        var reader = ExpReader(exp.substring(1,exp.length - 1))
+        val exp: String? = sr.readPair() ?: throw Exception("Syntax error.")
+        val reader = ExpReader(exp!!.substring(1,exp.length - 1))
         this.begin.init(reader)
 
         return this
     }
 
     override fun match(str: String): ArrayList<Int> {
-        val a =this.begin.match(str)
-        return a
+        return this.begin.match(str)
     }
 
 }

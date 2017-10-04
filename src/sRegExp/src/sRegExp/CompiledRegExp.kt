@@ -1,7 +1,6 @@
 package sRegExp
 
 import sRegExp.nodes.*
-import java.util.*
 import kotlin.collections.ArrayList
 
 class CompiledRegExp constructor(exp : String) {
@@ -19,7 +18,7 @@ class CompiledRegExp constructor(exp : String) {
 
 
     private fun compile() {
-        var reader = ExpReader(this.exp)
+        val reader = ExpReader(this.exp)
         if (reader.peek() == '^') {
             this.matchBegin = true
             reader.read()
@@ -46,7 +45,7 @@ class CompiledRegExp constructor(exp : String) {
         var len = 0
         while(index < str.length) {
             str = str.substring(index)
-            var n = this.findIndex(str)
+            val n = this.findIndex(str)
             if (n.second > 0) {
                 val fr = FindResult()
                 fr.success = true
@@ -69,8 +68,7 @@ class CompiledRegExp constructor(exp : String) {
 
     fun findOne(text : String) : FindResult{
         val r = this.findIndex(text)
-        //println(r)
-        var ret = FindResult()
+        val ret = FindResult()
         if(r.second >= 0)
         {
             ret.success = true
@@ -104,7 +102,7 @@ class CompiledRegExp constructor(exp : String) {
         var offset = 0
 
         for(i in r){
-            var rep = func(i.group[0])
+            val rep = func(i.group[0])
             ret = ret.substring(0, i.index + offset) + rep + ret.substring(i.index + i.length + offset)
             offset += rep.length - i.length
         }
@@ -131,7 +129,7 @@ class CompiledRegExp constructor(exp : String) {
     fun split(text : String) : Array<String> {
         var str = text
         val r = this.findAll(text)
-        var ret = ArrayList<String>()
+        val ret = ArrayList<String>()
         var offset = 0
 
         for(i in r) {
@@ -153,7 +151,6 @@ class CompiledRegExp constructor(exp : String) {
             e = this.matchReg(text)
         else {
             for (i in 0..text.length) {
-                //println("findIndex方法: " + text.substring(i))
                 e = this.matchReg(text.substring(i))
 
                 if(e != -1){
@@ -164,7 +161,6 @@ class CompiledRegExp constructor(exp : String) {
             }
         }
 
-        //println("s: {$s}  e: {$e}")
         return Pair(s, e)
     }
 
@@ -173,7 +169,7 @@ class CompiledRegExp constructor(exp : String) {
     }
 
     internal fun getNewGroupId() : Int{
-        var l = this.group.count()
+        val l = this.group.count()
         this.group.add("")
         return l
     }

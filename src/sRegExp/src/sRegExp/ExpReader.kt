@@ -1,8 +1,5 @@
 package sRegExp
 
-import kotlin.test.currentStackTrace
-
-
 class ExpReader constructor(exp : String) {
     private var exp : String = ""
     private var position : Int = 0
@@ -11,7 +8,7 @@ class ExpReader constructor(exp : String) {
         this.exp = exp
     }
 
-    fun size() :Int{
+    private fun size() :Int{
         return exp.length
     }
 
@@ -49,11 +46,11 @@ class ExpReader constructor(exp : String) {
 
     fun readPair() : String? { //Read () 仿佛自己不会写代码
         var res = ""
-        var pos = this.position
+        val pos = this.position
         var b = 0
 
         while(!this.end()) {
-            var ch = this.read()
+            val ch = this.read()
             when(ch){
                 '(' -> ++b
                 ')' -> --b
@@ -70,7 +67,7 @@ class ExpReader constructor(exp : String) {
 
     fun readUntil(c : Char) : String? {
         var res = ""
-        var pos = this.position
+        val pos = this.position
 
         while(!this.end()){
             val ch = this.read()
