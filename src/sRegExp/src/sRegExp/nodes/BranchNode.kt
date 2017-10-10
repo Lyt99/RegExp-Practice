@@ -1,5 +1,6 @@
 package sRegExp.nodes
 
+import sRegExp.CapturePair
 import sRegExp.CompiledRegExp
 import sRegExp.ExpReader
 import java.util.*
@@ -29,63 +30,72 @@ class BranchNode(re : CompiledRegExp) : MatchNode(re){
         return this
     }
 
-    override fun match(str : String) : ArrayList<Int> {
-        val res = ArrayList<Int>()
-        val stk = Stack<Triple<Int, MatchNode?, Pair<MatchNode?, String>>>() //起始index, 当前匹配, <上一匹配,上一匹配文本>
+    override fun match(str : String) : ArrayList<Pair<Int, ArrayList<CapturePair>>> {
+        val res = ArrayList<Pair<Int, ArrayList<CapturePair>>>()
+        val stk = Stack<Triple<Int, MatchNode?, ArrayList<CapturePair>>>() //起始index 当前匹配 [CapturePair]
+
         for (i in this.branches.reversed()) {
-            stk.push(Triple(0, i, Pair(null, "")))
+            stk.push(Triple(0, i, ArrayList()))
         }
 
 
         while (stk.isNotEmpty()) {
             val i = stk.pop()
-
             val r = i.second!!.match(str.substring(i.first))
 
             if (r.isEmpty()) {//未匹配到
                 continue
             }
             if (i.second?.nextNode == null) {//匹配完毕
-                r.forEach { res.add(i.first + it) }
+                r.reverse()//为什么要reverse???，啧
+                r.forEach {
+                    var list = i.third.clone() as ArrayList<CapturePair>
+                    list.addAll(it.second)
+                    res.add(Pair(it.first + i.first, list))
+                }
                 continue
             }
             for (it in r) {
-                stk.push(Triple(i.first + it, i.second!!.nextNode, Pair(i.second, str.substring(i.first, it + i.first))))
+                //stk.push(Triple(i.first + it, i.second!!.nextNode, Pair(i.second, str.substring(i.first, it + i.first))))
+                var list = i.third.clone() as ArrayList<CapturePair>//unchecked,绝望
+                list.addAll(it.second)
+                stk.push(Triple(i.first + it.first, i.second!!.nextNode, list))
             }
         }
-
 
         return res
 
     }
 
     fun matchReg(str : String) : Int{
-
-        val stk = Stack<Triple<Int, MatchNode?, Pair<MatchNode?, String>>>() //起始index, 当前匹配, <上一匹配,上一匹配文本>
+        val stk = Stack<Triple<Int, MatchNode?, ArrayList<CapturePair>>>() //起始index 当前匹配 [CapturePair]
         for (i in this.branches.reversed()) {
-            stk.push(Triple(0, i, Pair(null, "")))
+            stk.push(Triple(0, i, ArrayList()))
         }
 
 
         while (stk.isNotEmpty()) {
             val i = stk.pop()
             val r = i.second!!.match(str.substring(i.first))
-            if(i.third.first != null && i.third.first is CaptureNode) { //设置捕获组
-                this.parentRe.setGroup((i.third.first as CaptureNode).groupId, i.third.second)
-            }
 
             if (r.isEmpty()) {//未匹配到
+                println("匹配失败")
                 continue
             }
             if (i.second?.nextNode == null) {//匹配完毕
-                //特例：捕获器在结尾
-                if(i.second is CaptureNode) {
-                    this.parentRe.setGroup((i.second as CaptureNode).groupId, str.substring(i.first, i.first + r[r.count() - 1]))
+                val cns = r[r.count() - 1].second
+                cns.addAll(i.third)//合并捕获组
+
+                for(node in cns){
+                    this.parentRe.setGroup(node.id, node.str)
                 }
-                return i.first + r[r.count() - 1]
+
+                return i.first + r[r.count() - 1].first
             }
-            for (res in r) {
-                stk.push(Triple(i.first + res, i.second!!.nextNode, Pair(i.second, str.substring(i.first, res + i.first))))
+            for (it in r) {
+                var list = i.third.clone() as ArrayList<CapturePair>
+                list.addAll(it.second)
+                stk.push(Triple(i.first + it.first, i.second!!.nextNode, list))
             }
         }
             return -1

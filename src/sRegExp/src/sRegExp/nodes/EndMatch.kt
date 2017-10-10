@@ -1,5 +1,6 @@
 package sRegExp.nodes
 
+import sRegExp.CapturePair
 import sRegExp.CompiledRegExp
 import sRegExp.ExpReader
 
@@ -9,9 +10,9 @@ class EndMatch(re : CompiledRegExp) : MatchNode(re){
         return this
     }
 
-    override fun match(str : String) : ArrayList<Int>{
+    override fun match(str : String) : ArrayList<Pair<Int, ArrayList<CapturePair>>> {
         if(str.isEmpty())
-            return arrayListOf(0)
+            return arrayListOf(Pair(0, ArrayList()))
         else
             return ArrayList()
     }

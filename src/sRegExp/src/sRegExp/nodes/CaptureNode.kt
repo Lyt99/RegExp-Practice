@@ -1,12 +1,13 @@
 package sRegExp.nodes
 
+import sRegExp.CapturePair
 import sRegExp.CompiledRegExp
 import sRegExp.ExpReader
 
 class CaptureNode(re : CompiledRegExp) : MatchNode(re) {
 
     private var begin = BranchNode(this.parentRe)
-    var groupId = 0
+    var groupId = -1
 
     override fun init(sr: ExpReader): MatchNode {
         this.groupId = this.parentRe.getNewGroupId()
@@ -18,8 +19,15 @@ class CaptureNode(re : CompiledRegExp) : MatchNode(re) {
         return this
     }
 
-    override fun match(str: String): ArrayList<Int> {
-        return this.begin.match(str)
+    override fun match(str: String): ArrayList<Pair<Int, ArrayList<CapturePair>>> {
+
+        var ret = this.begin.match(str)
+        for(i in ret) {
+            i.second.add(CapturePair(this.groupId, str.substring(0, i.first)))
+        }
+
+        ret.reverse()
+        return ret
     }
 
 }

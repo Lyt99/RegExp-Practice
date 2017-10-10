@@ -1,5 +1,6 @@
 package sRegExp.nodes
 
+import sRegExp.CapturePair
 import sRegExp.CompiledRegExp
 import sRegExp.ExpReader
 
@@ -46,32 +47,20 @@ class CharMatch(re : CompiledRegExp) : MatchNode(re) {
     private var greedy : Boolean = true //?
     private var nomax : Boolean = false //+
 
-    override fun match(str : String) : ArrayList<Int>{
-        val r = ArrayList<Int>()
+    override fun match(str : String) : ArrayList<Pair<Int, ArrayList<CapturePair>>> {
+        val r = ArrayList<Pair<Int, ArrayList<CapturePair>>>()
         var len  = 1
-        if(min == 0) r.add(0)
+        if(min == 0) r.add(Pair(0, ArrayList()))
         for(i in str){
             if(this.matchCollection.any { it.match(i) }) {
-                //好丑
-                //可能逻辑错误
-                /*
-                if (len < min) ++len
-                else if (nomax) r.add(len++)
-                else if (len in min..max) r.add(len++)
-                else break*/
-
                 var breaksign = false
                 when {
                     len < min -> {
                         ++len
                     }
 
-                    len in min..max -> {
-                        r.add(len++)
-                    }
-
-                    nomax -> {
-                        r.add(len++)
+                    len in min..max || nomax-> {
+                        r.add(Pair(len++, ArrayList()))
                     }
 
                     else -> {
@@ -84,7 +73,6 @@ class CharMatch(re : CompiledRegExp) : MatchNode(re) {
                 break
         }
 
-        //println("CharMatch: $r($str)")
         if(!greedy) r.reverse()
         return r
     }
@@ -178,7 +166,7 @@ class CharMatch(re : CompiledRegExp) : MatchNode(re) {
                 t = t?.substring(1, t.length - 1) ?:throw Exception("Syntax Error: {$t}")
                 if(!t.contains(',')) {
                     this.min = t.toInt()
-                    this.nomax = true
+                    this.max = t.toInt()
                 }
                 else{
                     val i = t.split(',')

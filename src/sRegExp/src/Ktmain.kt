@@ -3,30 +3,38 @@ import sRegExp.RegExp
 
 fun main(args: Array<String>) {
     //println("Hello World!")
-    //TODO: 已确认多个()嵌套有问题，且为设计架构问题，准备重构吧(惊恐
+    //TODO: ()后+ * ? {}等实现，不过怕是很难了
+    //TODO: 代码太难看了，自己都快看不懂了，等待重构
 
-    /*
-    val regexp = "(1(\\d+))[0-9]{8}"
+    val regexp = "1((\\d{2,3})(\\d+))"
     //val regexp = "(.....)"
-    val text = "18677777777"
+    val text = "123456"
 
     val res = RegExp.findOne(regexp, text)
     println("RegExp: $regexp")
     if(res.success) {
-        println("是正确电话号码, 且前三位为${res.group[1]}, 前三位的后两位是${res.group[2]}")
+        print("匹配成功，group为: ")
+        for(i in res.group) {
+            print("'$i' ")
+        }
+        println()
     }
     else {
-        println("不是")
+        println("匹配失败 ")
     }
-    */
 
-    val regexp = "</*\\w+?>"
-    val text = "<html>a<title>Hello World!</html>b</title>"
-    println(text)
-    val cre = CompiledRegExp(regexp)
 
-    for(i in cre.split(text))
-        println("r:" + i)
+
+
+    //val regexp = "</*\\w+?>"
+
+    //val text = "c<html>a<title>Hello World!</html>b</title>d"
+    //println(text)
+    //val cre = CompiledRegExp(regexp)
+
+    //for(i in cre.split(text))
+    //println("r:" + i)
+
 
 
 }
